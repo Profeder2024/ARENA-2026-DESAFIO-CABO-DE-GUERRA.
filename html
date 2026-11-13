@@ -1,0 +1,551 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROBOT ARENA 2026 | Cabo de Guerra</title>
+<style>
+:root {
+ --bg:#07111f; --panel:#112238; --line:#29415d;
+ --cyan:#42e8f5; --blue:#438cff; --gold:#ffc857;
+ --red:#ff5d73; --green:#43e0a0;
+ --text:#edf5ff; --muted:#9eb2ca;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;min-height:100vh;color:var(--text);
+ font-family:Arial,Helvetica,sans-serif;
+ background:radial-gradient(circle at top right,#17375a,#07111f 55%,#050b14);
+}
+.container{max-width:1050px;margin:auto;padding:22px 16px 50px}
+header{
+ display:flex;justify-content:space-between;align-items:center;
+ border-bottom:1px solid var(--line);padding-bottom:18px;gap:10px
+}
+.logo{font-size:25px;color:var(--cyan)}
+.brand small{color:var(--cyan);letter-spacing:3px;font-weight:bold}
+.brand h1{font-size:20px;margin:5px 0}
+.status{font-size:11px;color:var(--green);border:1px solid #43e0a055;padding:9px;border-radius:20px}
+.hero{display:grid;grid-template-columns:1.3fr .7fr;gap:20px;padding:40px 0 25px;align-items:center}
+.hero h2{font-size:clamp(32px,5vw,55px);line-height:1.05;margin:12px 0}
+.hero h2 span{color:var(--cyan)}
+.hero p{color:var(--muted);line-height:1.7}
+.panel,.hero-card{
+ background:linear-gradient(145deg,#142940,#0d1a2b);
+ border:1px solid var(--line);border-radius:17px;padding:23px;
+ box-shadow:0 15px 40px #0004
+}
+.section{color:var(--cyan);font-size:12px;font-weight:bold;letter-spacing:2px;margin-bottom:16px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#071523;padding:15px;border:1px solid var(--line);border-radius:10px}
+.stat b{display:block;color:var(--cyan);font-size:26px}
+.stat small{font-size:10px;color:var(--muted)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+label{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}
+input{width:100%;padding:13px;background:#071523;color:white;border:1px solid var(--line);border-radius:9px}
+button{cursor:pointer;border:0;border-radius:9px;padding:13px 18px;font-weight:bold}
+.primary{background:linear-gradient(90deg,var(--cyan),#5b9cff);color:#061321}
+.secondary{background:#1a3048;color:white;border:1px solid var(--line)}
+button:hover{filter:brightness(1.12)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}
+.chip{font-size:11px;background:#172b42;padding:8px;border-radius:20px;color:#c5d7eb}
+.hidden{display:none!important}
+.quizhead{display:flex;gap:15px;align-items:center;margin-bottom:17px}
+.progressbox{flex:1}
+.meta{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:#172b42;border:1px solid var(--line);padding:7px 10px;border-radius:20px;font-size:11px;color:var(--muted)}
+.progress{height:7px;background:#263b53;margin-top:10px;border-radius:10px;overflow:hidden}
+.progress div{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0%;transition:.3s}
+.timer{font-size:22px;font-weight:bold;color:var(--gold);font-variant-numeric:tabular-nums}
+.question{font-size:clamp(20px,3vw,27px);line-height:1.4;margin:25px 0}
+.answers{display:grid;gap:11px}
+.answer{
+ display:flex;gap:12px;text-align:left;width:100%;
+ color:var(--text);background:#102238;border:1px solid #2a4059;
+ padding:15px;border-radius:11px;line-height:1.5
+}
+.answer:hover:not(:disabled){border-color:var(--cyan)}
+.letter{background:#203b58;color:var(--cyan);padding:5px 9px;border-radius:7px;font-weight:bold}
+.answer.correct{background:#10382f;border-color:var(--green)}
+.answer.wrong{background:#3a1c2b;border-color:var(--red)}
+.feedback{padding:15px;margin-top:15px;background:#0b1a2a;border:1px solid var(--line);border-radius:10px;line-height:1.6}
+.good{border-color:var(--green)}
+.bad{border-color:var(--red)}
+.quizfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px}
+.muted{font-size:12px;color:var(--muted)}
+.result{text-align:center;padding:30px 10px}
+.score{font-size:80px;font-weight:900;color:var(--cyan);margin:10px}
+.rank{font-weight:bold;font-size:19px}
+.review{text-align:left;margin-top:25px}
+.reviewitem{padding:14px 0;border-bottom:1px solid var(--line);line-height:1.5}
+.reviewitem p{font-size:13px;color:var(--muted)}
+footer{text-align:center;color:#71869e;font-size:11px;padding:25px}
+@media(max-width:700px){
+ .hero{grid-template-columns:1fr}
+ .fields{grid-template-columns:1fr}
+ .quizhead{flex-wrap:wrap}
+ .container{padding:14px}
+ .score{font-size:60px}
+}
+@media print{
+ body{background:white;color:black}
+ header,.actions button{display:none}
+ .panel{background:white;color:black;box-shadow:none}
+ .reviewitem p{color:#333}
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+ <div class="brand">
+  <div class="logo">⚙ ROBOTICS</div>
+  <small>COMPETITION SYSTEM</small>
+  <h1>ROBOT ARENA 2026</h1>
+ </div>
+ <div class="status">● SISTEMA ONLINE</div>
+</header>
+
+<section id="start">
+ <div class="hero">
+  <div>
+   <div class="section">MISSÃO DE CLASSIFICAÇÃO</div>
+   <h2>VOCÊ ESTÁ PRONTO PARA A <span>ARENA?</span></h2>
+   <p>Um verdadeiro competidor precisa dominar mecânica, eletrônica, programação, diagnóstico de falhas e regulamento. Teste seus conhecimentos e prove que está preparado para o desafio Cabo de Guerra.</p>
+  </div>
+  <div class="hero-card">
+   <div class="section">PAINEL DA MISSÃO</div>
+   <div class="stats">
+    <div class="stat"><b>20</b><small>QUESTÕES</small></div>
+    <div class="stat"><b>30:00</b><small>MINUTOS</small></div>
+    <div class="stat"><b>05</b><small>ÁREAS TÉCNICAS</small></div>
+    <div class="stat"><b>80%</b><small>APROVAÇÃO</small></div>
+   </div>
+  </div>
+ </div>
+
+ <div class="panel">
+  <div class="section">IDENTIFICAÇÃO DO COMPETIDOR</div>
+  <div class="fields">
+   <div><label>Nome do aluno</label><input id="student" placeholder="Digite seu nome"></div>
+   <div><label>Equipe / Turma</label><input id="team" placeholder="Ex.: Equipe Alfa"></div>
+  </div>
+  <div class="chips">
+   <span class="chip">✓ Correção comentada</span>
+   <span class="chip">✓ Questões embaralhadas</span>
+   <span class="chip">✓ Cronômetro</span>
+   <span class="chip">✓ Relatório individual</span>
+  </div>
+  <div class="actions">
+   <button class="primary" onclick="startQuiz()">INICIAR DESAFIO →</button>
+  </div>
+ </div>
+</section>
+
+<section id="game" class="hidden">
+ <div class="quizhead">
+  <div class="progressbox">
+   <div class="meta">
+    <span class="pill" id="counter"></span>
+    <span class="pill" id="category"></span>
+    <span class="pill">NÍVEL DIFÍCIL</span>
+   </div>
+   <div class="progress"><div id="bar"></div></div>
+  </div>
+  <div class="timer" id="timer">30:00</div>
+ </div>
+
+ <div class="panel">
+  <div class="section">ANÁLISE TÉCNICA • ESCOLHA A MELHOR DECISÃO</div>
+  <div class="question" id="question"></div>
+  <div class="answers" id="answers"></div>
+  <div id="feedback" class="feedback hidden"></div>
+  <div class="quizfoot">
+   <span class="muted" id="message">Aguardando resposta...</span>
+   <button class="primary" id="next" onclick="nextQuestion()" disabled>AVANÇAR →</button>
+  </div>
+ </div>
+</section>
+
+<section id="finish" class="hidden">
+ <div class="panel result">
+  <div class="section">MISSÃO CONCLUÍDA</div>
+  <h2 id="resultTitle"></h2>
+  <div class="score" id="score"></div>
+  <div class="rank" id="rank"></div>
+  <p class="muted" id="studentResult"></p>
+  <div class="stats">
+   <div class="stat"><b id="hits"></b><small>ACERTOS</small></div>
+   <div class="stat"><b id="elapsed"></b><small>TEMPO</small></div>
+   <div class="stat"><b id="wrong"></b><small>ERROS</small></div>
+   <div class="stat"><b>80%</b><small>META</small></div>
+  </div>
+  <div class="actions" style="justify-content:center">
+   <button class="primary" onclick="window.print()">IMPRIMIR RELATÓRIO</button>
+   <button class="secondary" onclick="location.reload()">NOVO DESAFIO</button>
+  </div>
+  <div class="review">
+   <div class="section">REVISÃO DAS RESPOSTAS</div>
+   <div id="reviewList"></div>
+  </div>
+ </div>
+</section>
+
+<footer>
+ ROBOT ARENA 2026 • DESAFIO CABO DE GUERRA<br>
+ Avaliação baseada no Manual do Robô Cabo de Guerra e no Regulamento do Torneio.
+</footer>
+</div>
+
+<script>
+const bank = [
+{
+c:"MECÂNICA E TRAÇÃO",
+q:"Durante um teste, o robô possui motores fortes, mas as rodas patinam quando começa a puxar o adversário. Qual intervenção está mais alinhada às recomendações do manual?",
+o:[
+"Aumentar a tensão acima do valor indicado.",
+"Melhorar a aderência dos pneus, mantê-los limpos e distribuir o peso sobre as rodas motrizes.",
+"Retirar a roda boba e deixar o chassi arrastar.",
+"Deslocar as baterias para longe das rodas motrizes."
+],a:1,
+e:"O manual recomenda pneus de borracha com boa tração e limpos, além de posicionar baterias e componentes sobre as rodas motrizes para aumentar a aderência."
+},
+{
+c:"MECÂNICA E TRAÇÃO",
+q:"A equipe instalou o suporte de duas baterias 18650 no centro do chassi. O robô apresenta tração insuficiente nas rodas motrizes. Qual análise é mais consistente?",
+o:[
+"O centro geométrico sempre maximiza a tração.",
+"O peso deve ser distribuído para aumentar a carga sobre as rodas motrizes; a posição do suporte pode precisar de ajuste.",
+"O suporte deve ficar necessariamente sobre a roda boba.",
+"A solução é remover uma bateria."
+],a:1,
+e:"O manual orienta posicionar o suporte das baterias sobre as rodas motrizes para aumentar a aderência. A posição deve ser validada por testes."
+},
+{
+c:"MECÂNICA E TRAÇÃO",
+q:"Após a montagem, uma roda apresenta resistência ao giro. Qual sequência é mais adequada?",
+o:[
+"Aumentar a potência dos motores.",
+"Ignorar, pois a Ponte H corrige o problema.",
+"Desligar a alimentação, verificar encaixe, alinhamento e fixação das rodas.",
+"Inverter os fios dos dois motores."
+],a:2,
+e:"O manual pede que as rodas girem livremente e estejam alinhadas. A resistência mecânica deve ser corrigida na montagem."
+},
+{
+c:"ELETRÔNICA • L298N",
+q:"O motor esquerdo está ligado em OUT1/OUT2 e o direito em OUT3/OUT4. Um motor gira no sentido contrário ao esperado. Qual correção é válida?",
+o:[
+"Trocar os polos da bateria.",
+"Inverter entre si os dois fios daquele motor na Ponte H ou ajustar o sentido no código.",
+"Ligar o motor diretamente ao 5V do Arduino.",
+"Retirar o GND comum."
+],a:1,
+e:"O manual orienta inverter a posição dos dois fios daquele motor na Ponte H quando o sentido estiver contrário."
+},
+{
+c:"ELETRÔNICA • L298N",
+q:"Qual associação entre entradas da L298N e pinos do Arduino corresponde exatamente ao manual?",
+o:[
+"IN1→D7; IN2→D8; IN3→D4; IN4→D5.",
+"IN1→D8; IN2→D7; IN3→D5; IN4→D4.",
+"IN1→D8; IN2→D5; IN3→D7; IN4→D4.",
+"IN1→D4; IN2→D5; IN3→D7; IN4→D8."
+],a:1,
+e:"O mapeamento indicado é IN1 em D8, IN2 em D7, IN3 em D5 e IN4 em D4."
+},
+{
+c:"ELETRÔNICA • L298N",
+q:"ENA e ENB permanecem com os jumpers originais instalados. Qual afirmação descreve o funcionamento previsto?",
+o:[
+"ENA e ENB precisam obrigatoriamente ser ligados a D9 e D10.",
+"Com os jumpers instalados, os canais ficam habilitados e os motores operam sem controle PWM de velocidade pelo Arduino.",
+"Os jumpers fazem o Arduino controlar a corrente por USB.",
+"Os jumpers invertem automaticamente o sentido."
+],a:1,
+e:"O manual informa que ENA e ENB permanecem habilitados pelos jumpers e não serão ligados ao Arduino. Não haverá controle PWM de velocidade nesse projeto."
+},
+{
+c:"ELETRÔNICA • ALIMENTAÇÃO",
+q:"O conjunto utiliza duas baterias 18650 em série, totalizando 7,4 V nominais. Qual ligação alimenta a entrada da Ponte H?",
+o:[
+"Positivo da bateria no GND e negativo no borne +12V.",
+"Positivo no borne +12V e negativo no GND da L298N.",
+"Positivo no VIN e negativo no D8.",
+"Os polos nos terminais OUT1 e OUT2."
+],a:1,
+e:"O manual determina positivo da bateria no borne +12V da Ponte H e negativo no GND. Nunca se deve inverter a polaridade."
+},
+{
+c:"ELETRÔNICA • ALIMENTAÇÃO",
+q:"Segundo o esquema do manual, como o Arduino Uno recebe alimentação pela Ponte H?",
+o:[
+"Borne 5V da Ponte H ao VIN do Arduino e GND ao GND, mantendo o jumper 5V-EN instalado, conforme o manual.",
+"Borne +12V diretamente ao pino 5V do Arduino.",
+"Saída OUT1 ao VIN e OUT2 ao GND.",
+"Somente pelo cabo USB."
+],a:0,
+e:"O manual descreve a ligação 5V da Ponte H → VIN e GND → GND do Arduino, mantendo o jumper 5V-EN."
+},
+{
+c:"SEGURANÇA ELÉTRICA",
+q:"Um aluno percebe que IN3 e IN4 foram conectados em ordem trocada. A bateria está ligada. Qual conduta respeita o manual?",
+o:[
+"Trocar os fios rapidamente.",
+"Desconectar a bateria antes de alterar qualquer ligação e só religar após conferir o circuito.",
+"Desligar apenas o Arduino pelo reset.",
+"Segurar os fios com uma ferramenta metálica."
+],a:1,
+e:"O manual orienta nunca conectar ou desconectar fios com a bateria ligada."
+},
+{
+c:"DIAGNÓSTICO",
+q:"Após conectar a bateria, o LED da Ponte H acende, mas o LED ON do Arduino permanece apagado. Qual é a ação indicada?",
+o:[
+"Continuar o teste dos motores.",
+"Desligar imediatamente a alimentação e revisar as conexões.",
+"Aumentar a tensão da bateria.",
+"Retirar o GND comum."
+],a:1,
+e:"O manual orienta observar os dois LEDs e, caso algum não acenda, desligar imediatamente a alimentação e revisar as conexões."
+},
+{
+c:"PROGRAMAÇÃO",
+q:"O programa faz o robô avançar continuamente, mas toda a lógica foi escrita em um único bloco extenso, sem funções. Qual melhoria atende ao prompt do manual?",
+o:[
+"Eliminar todos os comentários.",
+"Organizar o programa utilizando funções e comentários explicativos.",
+"Substituir os pinos sem alterar a montagem.",
+"Adicionar PWM mesmo com os jumpers instalados."
+],a:1,
+e:"O prompt do manual pede funções para organizar o código e comentários explicando cada parte."
+},
+{
+c:"PENSAMENTO COMPUTACIONAL E IA",
+q:"Uma equipe pede à IA: 'Faça um código para meu robô puxar forte'. O resultado não funciona. Qual crítica é mais consistente?",
+o:[
+"A IA não pode ser utilizada em robótica.",
+"O pedido não informa componentes, alimentação, ligações e restrições; é necessário fornecer detalhes, analisar a resposta e testar.",
+"Copiar o código de outra equipe resolve.",
+"A Ponte H L298N não é compatível com Arduino."
+],a:1,
+e:"O manual ensina a elaborar prompts completos, analisar as explicações da IA, comparar com o esquema e realizar testes."
+},
+{
+c:"PENSAMENTO COMPUTACIONAL E IA",
+q:"A IA gerou um código que usa D9 e D10 para controlar ENA e ENB por PWM. Entretanto, os jumpers permanecem instalados. Qual decisão demonstra domínio?",
+o:[
+"Aceitar o código, pois qualquer pino controla qualquer entrada.",
+"Revisar o código para corresponder à montagem real, sem depender de PWM em ENA/ENB.",
+"Remover os jumpers e ligar D9/D10 sem revisar o circuito.",
+"Trocar obrigatoriamente o Arduino."
+],a:1,
+e:"O código deve corresponder à montagem real. O manual define ENA/ENB com jumpers e IN1–IN4 nos pinos D8, D7, D5 e D4."
+},
+{
+c:"ESTRATÉGIA DE COMPETIÇÃO",
+q:"O robô anda em linha reta, mas os cabos ficam próximos às rodas e podem ser puxados para dentro. Qual avaliação é adequada?",
+o:[
+"É aceitável se os cabos estiverem isolados.",
+"É um risco mecânico: os cabos devem ser organizados e afastados das rodas e partes móveis.",
+"Aumentar a velocidade reduz o risco.",
+"Prender os cabos nos eixos."
+],a:1,
+e:"O manual orienta organizar os cabos para evitar que encostem nas rodas ou motores."
+},
+{
+c:"REGULAMENTO",
+q:"Durante um round, um integrante tenta reposicionar o próprio robô e o cabo com a mão. Qual é a interpretação correta?",
+o:[
+"É permitido se não tocar no robô adversário.",
+"É permitido apenas nos primeiros 30 segundos.",
+"É proibido tocar no robô, no adversário, no cabo ou na arena após o início.",
+"É permitido se avisar o público."
+],a:2,
+e:"O regulamento proíbe, após o início, tocar no robô, no adversário, no cabo ou na arena."
+},
+{
+c:"REGULAMENTO",
+q:"Uma disputa chega aos 3 minutos e nenhum robô ultrapassou a linha limite. O que deve acontecer?",
+o:[
+"A equipe com o robô mais pesado vence automaticamente.",
+"A disputa continua indefinidamente.",
+"Aplica-se o critério de desempate estabelecido pela organização.",
+"O round é automaticamente anulado."
+],a:2,
+e:"O regulamento prevê duração máxima de 3 minutos. O critério específico de desempate não é detalhado no documento."
+},
+{
+c:"REGULAMENTO",
+q:"Uma equipe vence o primeiro round, perde o segundo e vence o terceiro. Qual é o resultado?",
+o:[
+"A equipe vence a partida por conquistar dois rounds.",
+"A partida continua até cinco rounds.",
+"É empate.",
+"A equipe perde."
+],a:0,
+e:"A partida é disputada em até 3 rounds, vencendo a equipe que conquistar 2 rounds primeiro."
+},
+{
+c:"REGULAMENTO • W.O.",
+q:"A arbitragem chama uma equipe. Ela chega após 3 minutos e 20 segundos, embora o robô esteja funcionando. Qual consequência está prevista?",
+o:[
+"Recebe mais 3 minutos automaticamente.",
+"Pode ser declarado W.O., pois a tolerância máxima é de 3 minutos.",
+"A disputa começa com o cronômetro reduzido.",
+"A equipe vence se o adversário estiver na arena."
+],a:1,
+e:"O regulamento concede tolerância máxima de 3 minutos após a chamada. Depois disso, poderá ser declarado W.O."
+},
+{
+c:"REGULAMENTO • W.O.",
+q:"Duas equipes não comparecem dentro do período de tolerância. Como o regulamento trata essa situação?",
+o:[
+"A equipe que chegar primeiro depois vence.",
+"As duas recebem W.O., sem atribuição de vitória.",
+"A arbitragem escolhe por sorteio.",
+"A disputa é transferida para o final."
+],a:1,
+e:"Se nenhuma das duas equipes comparecer dentro do período de tolerância, ambas recebem W.O., sem atribuição de vitória."
+},
+{
+c:"REGULAMENTO • ARBITRAGEM",
+q:"Surge uma situação não prevista expressamente no regulamento. Qual instância decide?",
+o:[
+"A equipe que estiver vencendo.",
+"O professor da equipe.",
+"A equipe de arbitragem, conforme o regulamento e a organização.",
+"O público por votação."
+],a:2,
+e:"O regulamento determina que situações não previstas sejam decididas pela equipe de arbitragem. Situações excepcionais serão avaliadas pela organização."
+}
+];
+
+let questions=[],index=0,selected=null,score=0;
+let seconds=1800,startSeconds=1800,interval=null,log=[];
+
+function shuffle(arr){
+ let a=[...arr];
+ for(let i=a.length-1;i>0;i--){
+  let j=Math.floor(Math.random()*(i+1));
+  [a[i],a[j]]=[a[j],a[i]];
+ }
+ return a;
+}
+function startQuiz(){
+ if(!document.getElementById('student').value.trim()){
+  alert('Digite o nome do competidor.');
+  return;
+ }
+ questions=shuffle(bank);index=0;score=0;seconds=1800;log=[];
+ document.getElementById('start').classList.add('hidden');
+ document.getElementById('game').classList.remove('hidden');
+ interval=setInterval(()=>{
+  seconds--;updateTimer();
+  if(seconds<=0){clearInterval(interval);finishQuiz(true);}
+ },1000);
+ render();
+}
+function updateTimer(){
+ let m=Math.floor(seconds/60),s=seconds%60;
+ document.getElementById('timer').textContent=
+ String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+ if(seconds<=300)document.getElementById('timer').style.color='var(--red)';
+}
+function render(){
+ selected=null;
+ let q=questions[index];
+ document.getElementById('counter').textContent=
+ `QUESTÃO ${index+1} / ${questions.length}`;
+ document.getElementById('category').textContent=q.c;
+ document.getElementById('bar').style.width=(index/questions.length*100)+'%';
+ document.getElementById('question').textContent=q.q;
+ let area=document.getElementById('answers');
+ area.innerHTML='';
+ q.o.forEach((opt,i)=>{
+  let b=document.createElement('button');
+  b.className='answer';
+  b.innerHTML=`<span class="letter">${'ABCD'[i]}</span><span>${opt}</span>`;
+  b.onclick=()=>choose(i);
+  area.appendChild(b);
+ });
+ let f=document.getElementById('feedback');
+ f.className='feedback hidden';f.textContent='';
+ document.getElementById('message').textContent='Selecione uma alternativa.';
+ let next=document.getElementById('next');
+ next.disabled=true;
+ next.textContent=index===questions.length-1?'FINALIZAR MISSÃO':'AVANÇAR →';
+}
+function choose(i){
+ if(selected!==null)return;
+ selected=i;
+ let q=questions[index],ok=i===q.a;
+ if(ok)score++;
+ [...document.querySelectorAll('.answer')].forEach((b,j)=>{
+  b.disabled=true;
+  if(j===q.a)b.classList.add('correct');
+  if(j===i&&!ok)b.classList.add('wrong');
+ });
+ log.push({
+  q:q.q,choice:q.o[i],correct:q.o[q.a],
+  ok,explanation:q.e,category:q.c
+ });
+ let f=document.getElementById('feedback');
+ f.className='feedback '+(ok?'good':'bad');
+ f.innerHTML=`<b>${ok?'✓ RESPOSTA CORRETA':'✕ RESPOSTA INCORRETA'}</b>${q.e}`;
+ document.getElementById('message').textContent=ok?'Ponto registrado.':'Resposta registrada. Revise a explicação.';
+ document.getElementById('next').disabled=false;
+}
+function nextQuestion(){
+ if(selected===null)return;
+ if(index<questions.length-1){index++;render();}
+ else finishQuiz(false);
+}
+function finishQuiz(timeUp){
+ clearInterval(interval);
+ document.getElementById('game').classList.add('hidden');
+ document.getElementById('finish').classList.remove('hidden');
+ let pct=Math.round(score/questions.length*100);
+ let wrong=questions.length-score;
+ document.getElementById('score').textContent=pct+'%';
+ document.getElementById('hits').textContent=score+'/'+questions.length;
+ document.getElementById('wrong').textContent=wrong;
+ let used=startSeconds-seconds;
+ let m=Math.floor(used/60),s=used%60;
+ document.getElementById('elapsed').textContent=
+ String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+ let name=document.getElementById('student').value.trim();
+ let team=document.getElementById('team').value.trim();
+ document.getElementById('studentResult').textContent=
+ name+(team?' • '+team:'')+(timeUp?' • Tempo esgotado':'');
+ let title,rank;
+ if(pct>=90){
+  title='COMPETIDOR DE ALTO DESEMPENHO';
+  rank='ELITE DA ARENA — DOMÍNIO EXCELENTE';
+ }else if(pct>=80){
+  title='MISSÃO APROVADA';
+  rank='APTO PARA A COMPETIÇÃO — BOM DOMÍNIO';
+ }else if(pct>=60){
+  title='QUASE LÁ';
+  rank='EM TREINAMENTO — REFORÇAR PONTOS FRACOS';
+ }else{
+  title='MISSÃO DE TREINAMENTO';
+  rank='RETOMAR O TREINAMENTO ANTES DA COMPETIÇÃO';
+ }
+ document.getElementById('resultTitle').textContent=title;
+ document.getElementById('rank').textContent=rank;
+ document.getElementById('reviewList').innerHTML=log.map((r,i)=>`
+ <div class="reviewitem">
+ <b>${i+1}. ${r.ok?'✓':'✕'} ${r.category}</b>
+ <p>${r.q}</p>
+ <p><strong>Sua resposta:</strong> ${r.choice}</p>
+ ${r.ok?'':`<p><strong>Resposta correta:</strong> ${r.correct}</p>`}
+ <p>${r.explanation}</p>
+ </div>`).join('');
+}
+</script>
+</body>
+</html>
